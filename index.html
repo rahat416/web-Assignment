@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Periodic Table of the Elements</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#fff;
+  color:#111;
+}
+.page{
+  width:min(1500px,98vw);
+  margin:20px auto 35px;
+}
+h1{
+  text-align:center;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:30px;
+  margin:8px 0 18px;
+}
+.table{
+  display:grid;
+  grid-template-columns:repeat(18,minmax(48px,1fr));
+  grid-template-rows:repeat(7,78px);
+  gap:4px;
+}
+.element{
+  border:1.5px solid #222;
+  padding:4px 3px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  line-height:1.05;
+  min-width:0;
+}
+.num{font-size:10px;align-self:flex-start}
+.symbol{font-size:21px;font-weight:700;margin:2px 0}
+.name{font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.mass{font-size:8px;margin-top:2px}
+.blank{border:none}
+.s{background:#fff2a8}.a{background:#ffd28c}.t{background:#9fd7f5}
+.p{background:#a9e8a1}.m{background:#c8f1d0}.n{background:#d7f4b7}
+.h{background:#d7eaff}.g{background:#f5c6e8}
+.l{background:#d9b7ee}.x{background:#c7c7c7}
+
+.series{
+  margin-top:18px;
+  display:grid;
+  grid-template-columns:100px repeat(15,minmax(48px,1fr));
+  gap:4px;
+}
+.series-title{
+  border:1.5px solid #222;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  font-size:11px;
+  text-align:center;
+  background:#eee;
+}
+.series .element{height:68px}
+.legend{
+  margin-top:18px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px 18px;
+  justify-content:center;
+  font-size:11px;
+}
+.legend span{display:flex;align-items:center;gap:5px}
+.swatch{width:15px;height:15px;border:1px solid #333;display:inline-block}
+.note{text-align:center;font-size:11px;color:#444;margin-top:10px}
+
+@media(max-width:900px){
+  .page{width:100%;overflow-x:auto;padding:0 8px}
+  .table{width:1200px}
+  .series{width:1200px}
+  h1{font-size:24px}
+}
+</style>
+</head>
+<body>
+<div class="page">
+<h1>Periodic Table of the Elements</h1>
+
+<div class="table" id="table"></div>
+
+<div class="series" id="series"></div>
+
+<div class="legend">
+  <span><i class="swatch s"></i>Alkali metals</span>
+  <span><i class="swatch a"></i>Alkaline earth metals</span>
+  <span><i class="swatch t"></i>Transition metals</span>
+  <span><i class="swatch p"></i>Post-transition metals</span>
+  <span><i class="swatch m"></i>Metalloids</span>
+  <span><i class="swatch n"></i>Nonmetals</span>
+  <span><i class="swatch g"></i>Noble gases</span>
+  <span><i class="swatch l"></i>Lanthanides/Actinides</span>
+</div>
+<div class="note">Atomic number • Symbol • Element name • Atomic mass</div>
+</div>
+
+<script>
+const E = [
+["H","Hydrogen","1.008","n",1,1],["He","Helium","4.003","g",1,18],
+["Li","Lithium","6.941","s",2,1],["Be","Beryllium","9.012","a",2,2],["B","Boron","10.81","m",2,13],["C","Carbon","12.01","n",2,14],["N","Nitrogen","14.01","n",2,15],["O","Oxygen","16.00","n",2,16],["F","Fluorine","19.00","n",2,17],["Ne","Neon","20.18","g",2,18],
+["Na","Sodium","22.99","s",3,1],["Mg","Magnesium","24.31","a",3,2],["Al","Aluminium","26.98","p",3,13],["Si","Silicon","28.09","m",3,14],["P","Phosphorus","30.97","n",3,15],["S","Sulfur","32.06","n",3,16],["Cl","Chlorine","35.45","n",3,17],["Ar","Argon","39.95","g",3,18],
+["K","Potassium","39.10","s",4,1],["Ca","Calcium","40.08","a",4,2],["Sc","Scandium","44.96","t",4,3],["Ti","Titanium","47.90","t",4,4],["V","Vanadium","50.94","t",4,5],["Cr","Chromium","52.00","t",4,6],["Mn","Manganese","54.94","t",4,7],["Fe","Iron","55.85","t",4,8],["Co","Cobalt","58.93","t",4,9],["Ni","Nickel","58.69","t",4,10],["Cu","Copper","63.55","t",4,11],["Zn","Zinc","65.38","t",4,12],["Ga","Gallium","69.72","p",4,13],["Ge","Germanium","72.63","m",4,14],["As","Arsenic","74.92","m",4,15],["Se","Selenium","78.97","n",4,16],["Br","Bromine","79.90","n",4,17],["Kr","Krypton","83.80","g",4,18],
+["Rb","Rubidium","85.47","s",5,1],["Sr","Strontium","87.62","a",5,2],["Y","Yttrium","88.91","t",5,3],["Zr","Zirconium","91.22","t",5,4],["Nb","Niobium","92.91","t",5,5],["Mo","Molybdenum","95.95","t",5,6],["Tc","Technetium","98","t",5,7],["Ru","Ruthenium","101.1","t",5,8],["Rh","Rhodium","102.9","t",5,9],["Pd","Palladium","106.4","t",5,10],["Ag","Silver","107.9","t",5,11],["Cd","Cadmium","112.4","t",5,12],["In","Indium","114.8","p",5,13],["Sn","Tin","118.7","p",5,14],["Sb","Antimony","121.8","m",5,15],["Te","Tellurium","127.6","m",5,16],["I","Iodine","126.9","n",5,17],["Xe","Xenon","131.3","g",5,18],
+["Cs","Cesium","132.9","s",6,1],["Ba","Barium","137.3","a",6,2],["Hf","Hafnium","178.5","t",6,4],["Ta","Tantalum","180.9","t",6,5],["W","Tungsten","183.8","t",6,6],["Re","Rhenium","186.2","t",6,7],["Os","Osmium","190.2","t",6,8],["Ir","Iridium","192.2","t",6,9],["Pt","Platinum","195.1","t",6,10],["Au","Gold","197.0","t",6,11],["Hg","Mercury","200.6","t",6,12],["Tl","Thallium","204.4","p",6,13],["Pb","Lead","207.2","p",6,14],["Bi","Bismuth","209.0","p",6,15],["Po","Polonium","209","p",6,16],["At","Astatine","210","m",6,17],["Rn","Radon","222","g",6,18],
+["Fr","Francium","223","s",7,1],["Ra","Radium","226","a",7,2],["Rf","Rutherfordium","267","t",7,4],["Db","Dubnium","268","t",7,5],["Sg","Seaborgium","269","t",7,6],["Bh","Bohrium","270","t",7,7],["Hs","Hassium","277","t",7,8],["Mt","Meitnerium","278","t",7,9],["Ds","Darmstadtium","281","t",7,10],["Rg","Roentgenium","282","t",7,11],["Cn","Copernicium","285","t",7,12],["Nh","Nihonium","286","p",7,13],["Fl","Flerovium","289","p",7,14],["Mc","Moscovium","290","p",7,15],["Lv","Livermorium","293","p",7,16],["Ts","Tennessine","294","n",7,17],["Og","Oganesson","294","g",7,18]
+];
+
+const names = [
+"H","He","Li","Be","B","C","N","O","F","Ne","Na","Mg","Al","Si","P","S","Cl","Ar",
+"K","Ca","Sc","Ti","V","Cr","Mn","Fe","Co","Ni","Cu","Zn","Ga","Ge","As","Se","Br","Kr",
+"Rb","Sr","Y","Zr","Nb","Mo","Tc","Ru","Rh","Pd","Ag","Cd","In","Sn","Sb","Te","I","Xe",
+"Cs","Ba","La","Ce","Pr","Nd","Pm","Sm","Eu","Gd","Tb","Dy","Ho","Er","Tm","Yb","Lu",
+"Hf","Ta","W","Re","Os","Ir","Pt","Au","Hg","Tl","Pb","Bi","Po","At","Rn",
+"Fr","Ra","Ac","Th","Pa","U","Np","Pu","Am","Cm","Bk","Cf","Es","Fm","Md","No","Lr",
+"Rf","Db","Sg","Bh","Hs","Mt","Ds","Rg","Cn","Nh","Fl","Mc","Lv","Ts","Og"
+];
+
+const atomic = {
+H:1,He:2,Li:3,Be:4,B:5,C:6,N:7,O:8,F:9,Ne:10,Na:11,Mg:12,Al:13,Si:14,P:15,S:16,Cl:17,Ar:18,
+K:19,Ca:20,Sc:21,Ti:22,V:23,Cr:24,Mn:25,Fe:26,Co:27,Ni:28,Cu:29,Zn:30,Ga:31,Ge:32,As:33,Se:34,Br:35,Kr:36,
+Rb:37,Sr:38,Y:39,Zr:40,Nb:41,Mo:42,Tc:43,Ru:44,Rh:45,Pd:46,Ag:47,Cd:48,In:49,Sn:50,Sb:51,Te:52,I:53,Xe:54,
+Cs:55,Ba:56,La:57,Ce:58,Pr:59,Nd:60,Pm:61,Sm:62,Eu:63,Gd:64,Tb:65,Dy:66,Ho:67,Er:68,Tm:69,Yb:70,Lu:71,
+Hf:72,Ta:73,W:74,Re:75,Os:76,Ir:77,Pt:78,Au:79,Hg:80,Tl:81,Pb:82,Bi:83,Po:84,At:85,Rn:86,
+Fr:87,Ra:88,Ac:89,Th:90,Pa:91,U:92,Np:93,Pu:94,Am:95,Cm:96,Bk:97,Cf:98,Es:99,Fm:100,Md:101,No:102,Lr:103,
+Rf:104,Db:105,Sg:106,Bh:107,Hs:108,Mt:109,Ds:110,Rg:111,Cn:112,Nh:113,Fl:114,Mc:115,Lv:116,Ts:117,Og:118
+};
+
+const fullNames = {
+H:"Hydrogen",He:"Helium",Li:"Lithium",Be:"Beryllium",B:"Boron",C:"Carbon",N:"Nitrogen",O:"Oxygen",F:"Fluorine",Ne:"Neon",
+Na:"Sodium",Mg:"Magnesium",Al:"Aluminium",Si:"Silicon",P:"Phosphorus",S:"Sulfur",Cl:"Chlorine",Ar:"Argon",
+K:"Potassium",Ca:"Calcium",Sc:"Scandium",Ti:"Titanium",V:"Vanadium",Cr:"Chromium",Mn:"Manganese",Fe:"Iron",Co:"Cobalt",Ni:"Nickel",Cu:"Copper",Zn:"Zinc",
+Ga:"Gallium",Ge:"Germanium",As:"Arsenic",Se:"Selenium",Br:"Bromine",Kr:"Krypton",Rb:"Rubidium",Sr:"Strontium",Y:"Yttrium",Zr:"Zirconium",Nb:"Niobium",Mo:"Molybdenum",
+Tc:"Technetium",Ru:"Ruthenium",Rh:"Rhodium",Pd:"Palladium",Ag:"Silver",Cd:"Cadmium",In:"Indium",Sn:"Tin",Sb:"Antimony",Te:"Tellurium",I:"Iodine",Xe:"Xenon",
+Cs:"Cesium",Ba:"Barium",La:"Lanthanum",Ce:"Cerium",Pr:"Praseodymium",Nd:"Neodymium",Pm:"Promethium",Sm:"Samarium",Eu:"Europium",Gd:"Gadolinium",Tb:"Terbium",
+Dy:"Dysprosium",Ho:"Holmium",Er:"Erbium",Tm:"Thulium",Yb:"Ytterbium",Lu:"Lutetium",Hf:"Hafnium",Ta:"Tantalum",W:"Tungsten",Re:"Rhenium",Os:"Osmium",
+Ir:"Iridium",Pt:"Platinum",Au:"Gold",Hg:"Mercury",Tl:"Thallium",Pb:"Lead",Bi:"Bismuth",Po:"Polonium",At:"Astatine",Rn:"Radon",Fr:"Francium",Ra:"Radium",
+Ac:"Actinium",Th:"Thorium",Pa:"Protactinium",U:"Uranium",Np:"Neptunium",Pu:"Plutonium",Am:"Americium",Cm:"Curium",Bk:"Berkelium",Cf:"Californium",
+Es:"Einsteinium",Fm:"Fermium",Md:"Mendelevium",No:"Nobelium",Lr:"Lawrencium",Rf:"Rutherfordium",Db:"Dubnium",Sg:"Seaborgium",Bh:"Bohrium",Hs:"Hassium",
+Mt:"Meitnerium",Ds:"Darmstadtium",Rg:"Roentgenium",Cn:"Copernicium",Nh:"Nihonium",Fl:"Flerovium",Mc:"Moscovium",Lv:"Livermorium",Ts:"Tennessine",Og:"Oganesson"
+};
+
+const mass = {
+H:"1.008",He:"4.003",Li:"6.941",Be:"9.012",B:"10.81",C:"12.01",N:"14.01",O:"16.00",F:"19.00",Ne:"20.18",
+Na:"22.99",Mg:"24.31",Al:"26.98",Si:"28.09",P:"30.97",S:"32.06",Cl:"35.45",Ar:"39.95",K:"39.10",Ca:"40.08",Sc:"44.96",Ti:"47.90",V:"50.94",Cr:"52.00",Mn:"54.94",
+Fe:"55.85",Co:"58.93",Ni:"58.69",Cu:"63.55",Zn:"65.38",Ga:"69.72",Ge:"72.63",As:"74.92",Se:"78.97",Br:"79.90",Kr:"83.80",Rb:"85.47",Sr:"87.62",Y:"88.91",Zr:"91.22",
+Nb:"92.91",Mo:"95.95",Tc:"98",Ru:"101.1",Rh:"102.9",Pd:"106.4",Ag:"107.9",Cd:"112.4",In:"114.8",Sn:"118.7",Sb:"121.8",Te:"127.6",I:"126.9",Xe:"131.3",
+Cs:"132.9",Ba:"137.3",La:"138.9",Ce:"140.1",Pr:"140.9",Nd:"144.2",Pm:"145",Sm:"150.4",Eu:"152.0",Gd:"157.3",Tb:"158.9",Dy:"162.5",Ho:"164.9",Er:"167.3",Tm:"168.9",Yb:"173.0",Lu:"175.0",
+Hf:"178.5",Ta:"180.9",W:"183.8",Re:"186.2",Os:"190.2",Ir:"192.2",Pt:"195.1",Au:"197.0",Hg:"200.6",Tl:"204.4",Pb:"207.2",Bi:"209.0",Po:"209",At:"210",Rn:"222",
+Fr:"223",Ra:"226",Ac:"227",Th:"232.0",Pa:"231.0",U:"238.0",Np:"237",Pu:"244",Am:"243",Cm:"247",Bk:"247",Cf:"251",Es:"252",Fm:"257",Md:"258",No:"259",Lr:"266",
+Rf:"267",Db:"268",Sg:"269",Bh:"270",Hs:"277",Mt:"278",Ds:"281",Rg:"282",Cn:"285",Nh:"286",Fl:"289",Mc:"290",Lv:"293",Ts:"294",Og:"294"
+};
+
+function makeCell(sym, cls, row, col, target){
+  const d=document.createElement("div");
+  d.className="element "+cls;
+  d.style.gridRow=row;
+  d.style.gridColumn=col;
+  d.innerHTML=`<span class="num">${atomic[sym]||""}</span><span class="symbol">${sym}</span><span class="name">${fullNames[sym]||""}</span><span class="mass">${mass[sym]||""}</span>`;
+  target.appendChild(d);
+}
+
+// Main table: use the exact positions from the conventional 18-column periodic table.
+const main=document.getElementById("table");
+E.forEach(([sym,name,ma,cls,row,col])=>{
+  // Leave La/Ac positions as placeholders pointing to the separated rows.
+  if(sym==="La" || sym==="Ac") return;
+  makeCell(sym,cls,row,col,main);
+});
+
+// placeholders for the f-block positions
+[["57-71","l",6,3],["89-103","l",7,3]].forEach(([txt,cls,row,col])=>{
+  const d=document.createElement("div");
+  d.className="element "+cls;
+  d.style.gridRow=row; d.style.gridColumn=col;
+  d.innerHTML=`<span class="num"></span><span class="symbol">${txt}</span><span class="name">Lanthanides</span>`;
+  if(row===7)d.querySelector(".name").textContent="Actinides";
+  main.appendChild(d);
+});
+
+// f-block rows
+const series=document.getElementById("series");
+const lanths=["La","Ce","Pr","Nd","Pm","Sm","Eu","Gd","Tb","Dy","Ho","Er","Tm","Yb","Lu"];
+const acts=["Ac","Th","Pa","U","Np","Pu","Am","Cm","Bk","Cf","Es","Fm","Md","No","Lr"];
+
+function seriesRow(title,arr){
+  const t=document.createElement("div"); t.className="series-title"; t.textContent=title; series.appendChild(t);
+  arr.forEach(sym=>makeCell(sym,"l",1,0,series));
+}
+seriesRow("Lanthanide Series",lanths);
+seriesRow("Actinide Series",acts);
+
+// Fix series grid positions after creation.
+const children=[...series.children];
+children.forEach((el,i)=>{
+  const row=Math.floor(i/16)+1;
+  const col=(i%16)+1;
+  el.style.gridRow=row;
+  el.style.gridColumn=col;
+});
+</script>
+</body>
+</html>
